@@ -1,0 +1,1 @@
+// Mapper class for converting network models to domain models and vice versa.

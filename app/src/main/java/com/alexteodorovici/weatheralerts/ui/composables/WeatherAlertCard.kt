@@ -1,0 +1,1 @@
+// Composable for displaying a single weather alert.
