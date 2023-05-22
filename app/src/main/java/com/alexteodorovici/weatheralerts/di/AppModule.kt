@@ -2,12 +2,12 @@ package com.alexteodorovici.weatheralerts.di
 // Hilt module for providing dependencies.
 
 import com.alexteodorovici.weatheralerts.data.network.ApiService
-import com.alexteodorovici.weatheralerts.data.network.ImageDataSource
 import com.alexteodorovici.weatheralerts.data.network.WeatherDataSource
-import com.alexteodorovici.weatheralerts.data.repository.ImageRepository
 import com.alexteodorovici.weatheralerts.data.repository.WeatherRepository
-import com.alexteodorovici.weatheralerts.domain.usecase.FetchImageUseCase
-import com.alexteodorovici.weatheralerts.domain.usecase.FetchWeatherUseCase
+import com.alexteodorovici.weatheralerts.domain.mapper.AlertMapper
+import com.alexteodorovici.weatheralerts.domain.usecase.FetchWeatherAlertsUseCase
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,30 +29,27 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideMoshi(): Moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+
+    @Provides
+    @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService =
         retrofit.create(ApiService::class.java)
 
     @Provides
-    fun provideWeatherDataSource(apiService: ApiService): WeatherDataSource =
-        WeatherDataSource(apiService)
-
-    @Provides
-    fun provideImageDataSource(): ImageDataSource =
-        ImageDataSource()
+    fun provideWeatherDataSource(): WeatherDataSource =
+        WeatherDataSource()
 
     @Provides
     fun provideWeatherRepository(weatherDataSource: WeatherDataSource): WeatherRepository =
         WeatherRepository(weatherDataSource)
 
     @Provides
-    fun provideImageRepository(imageDataSource: ImageDataSource): ImageRepository =
-        ImageRepository(imageDataSource)
+    fun provideFetchWeatherAlertsUseCase(weatherRepository: WeatherRepository): FetchWeatherAlertsUseCase =
+        FetchWeatherAlertsUseCase(weatherRepository)
 
     @Provides
-    fun provideFetchWeatherUseCase(weatherRepository: WeatherRepository): FetchWeatherUseCase =
-        FetchWeatherUseCase(weatherRepository)
-
-    @Provides
-    fun provideFetchImageUseCase(imageRepository: ImageRepository): FetchImageUseCase =
-        FetchImageUseCase(imageRepository)
+    fun provideAlertMapper(): AlertMapper = AlertMapper()
 }
